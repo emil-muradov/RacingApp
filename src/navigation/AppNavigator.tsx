@@ -1,14 +1,15 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import {Drivers} from '../modules/drivers/components/Drivers.tsx';
-import {DriverDetails} from '../modules/drivers/components/DriverDetails.tsx';
-import {DriverRaces} from '../modules/drivers/components/DriverRaces.tsx';
+import { RootStackParamList } from './types.ts';
+import { DriversScreen } from '../modules/drivers/screens/DriversScreen.tsx';
+import { DriverDetailsScreen } from '../modules/drivers/screens/DriverDetailsScreen.tsx';
+import { RacesScreen } from '../modules/drivers/screens/RacesScreen.tsx';
 
-const Stack = createStackNavigator();
+const RootStack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => (
-  <Stack.Navigator>
-    <Stack.Screen name="Drivers" component={Drivers} />
-    <Stack.Screen name="DriverDetails" component={DriverDetails} />
-    <Stack.Screen name="DriverRaces" component={DriverRaces} />
-  </Stack.Navigator>
+  <RootStack.Navigator initialRouteName="Drivers">
+    <RootStack.Screen name="Drivers" component={DriversScreen} />
+    <RootStack.Screen name="DriverDetails" component={DriverDetailsScreen} />
+    <RootStack.Screen name="Races" component={RacesScreen} />
+  </RootStack.Navigator>
 );

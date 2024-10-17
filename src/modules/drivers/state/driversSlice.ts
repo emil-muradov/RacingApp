@@ -1,31 +1,43 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../../axios';
+import { fetchDrivers } from '../services/api-service.ts';
+import { Driver } from '../types/api-types.ts';
 
-export const fetchDrivers = createAsyncThunk('drivers/fetchDrivers', async (page: number) => {
-  const response = await axiosInstance.get(`/drivers.json?limit=10&offset=${page * 10}`);
-  console.log('drivers', response.data.MRData.DriverTable.Drivers.map(d => Object.keys(d)));
-  return response.data.MRData.DriverTable.Drivers;
-});
+export const fetchDriversThunk = createAsyncThunk(
+  'fetch/drivers',
+  ({ page, limit }: { page: number; limit: number }) => fetchDrivers(page, limit),
+);
+
+type DriversState = {
+  drivers: Driver[];
+  total: number;
+  loading: boolean;
+  error: string | null;
+};
+
+const initialState: DriversState = {
+  drivers: [],
+  total: 0,
+  loading: false,
+  error: null,
+};
 
 const driversSlice = createSlice({
   name: 'drivers',
-  initialState: {
-    drivers: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchDrivers.pending, (state) => {
+    builder.addCase(fetchDriversThunk.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(fetchDrivers.fulfilled, (state, action) => {
+    builder.addCase(fetchDriversThunk.fulfilled, (state, action) => {
       state.loading = false;
-      state.drivers = action.payload;
+      const { MRData } = action.payload;
+      state.drivers = MRData.DriverTable.Drivers;
+      state.total = parseInt(MRData.total, 10);
     });
-    builder.addCase(fetchDrivers.rejected, (state, action) => {
+    builder.addCase(fetchDriversThunk.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.error.message;
+      state.error = action.error.message || null;
     });
   },
 });
